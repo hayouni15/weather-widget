@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+     <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="HandheldFriendly" content="true">
+      <title>Weather widget by @remtsoy</title>
+      <link href='http://fonts.googleapis.com/css?family=Roboto:400,100,300' rel='stylesheet' type='text/css'>
+      
+      
+   <body >
+
+      <div class="main-wrapper" >
+
+         <div class="main-wrapper-mask"></div>
+         <div class="main-wrapper-blur" style="background:black;"></div>
+         <div class="main-wrapper-front">
+            <div class="full-center">
+               <input type='text' id='ville' placeholder="recherche par ville" style="background: #ffffff;border-radius: 8px;">
+
+<button style="color: white; background: #1f70b4; border: none;" onclick="forecastit()">Click me</button>
+               <div class="widget-block">
+               	<!-- MAIN AREA -->
+                  <div class="img-area">
+                     <div class="img-area-mask"></div>
+                     <img src="https://68.media.tumblr.com/ccbf132436daf72bc7f5eb7202ddfe3c/tumblr_odahumf0e01v70ye6o1_500.gif" alt="">
+                     <div class="img-area-front">
+                        <h5 class="location"></h5>
+                        <p class="today"></p>
+                        <div class="weather-desc">
+                           <span>Tounci Meteo</span>
+                        </div>
+                        <ul class="weather-block-info">
+                           <li>
+                              <div class="temperature"></div>
+                           </li>
+                           <li class="image" style="margin-left: 47px;">
+                           	
+                              <!-- /MAIN ANIMATED SVG WEATHER ICON -->
+                           </li>
+                           <li style="margin-left: 70px">
+                              <ul class="weather-params" style="    height: 100%;margin-left: 29px;">
+                                 <li style="display: flex;margin-bottom: 9px;"><img style="width: 25%;height: 50%;margin-right: 20px;" src="https://image.flaticon.com/icons/svg/365/365240.svg"> <span class="temp-max"></span></li>
+                                 <li style="display: flex; margin-bottom: 9px;"><img style="width: 25%;height: 50%;margin-right: 20px;" src="https://image.flaticon.com/icons/svg/365/365239.svg"> <span class="temp-min"></span></li>
+                                 <li style="display: flex;margin-bottom: 9px;"><img style="width: 25%;height: 50%;margin-right: 20px;" src="https://cdn.iconscout.com/public/images/icon/free/png-512/humidity-forecast-hydration-precipitation-temperature-weather-3a64e557720613a1-512x512.png"> <span class="humidity"></span></li>
+                                 <li style="display: flex;margin-bottom: 9px;"><img style="width: 25%;height: 50%;margin-right: 20px;" src="http://www.iconsfind.com/wp-content/uploads/2015/11/20151129_565a5f240abc6-210x210.png"> <span class="wind"></span></li>
+                              </ul>
+                           </li>
+                        </ul>
+                     </div>
+                  </div>
+                  <!-- /MAIN AREA -->
+                  <!-- WEATHER FORECAST -->
+                  <div style="display: flex;" >
+                  <ul  class="week-forecast">
+                     <li style="    z-index: 999999999;position: relative;background: blueviolet;margin-right: 20px;" class="sun">
+                        <div class="inner">
+                           <h5 class="week-day">Aujourd'hui</h5>
+                          
+                           <ul style="    margin-left: -61px;"  class="day1"></ul>
+                        </div>
+                     </li>
+                   
+                     <li >
+                        <div class="inner">
+                           <h5 class="week-day">Demain</h5>
+                          <ul style="    margin-left: -61px;" class="day2"></ul>
+                        </div>
+                     </li>
+                     <li >
+                        <div class="inner">
+                           <h5 class="week-day">Dans Deux Jours</h5>
+                           <ul     style="    margin-left: -61px;" class="day3"></ul>
+                        </div>
+                     </li>
+                     <li >
+                        <div class="inner">
+                           <h5 class="week-day">Dans trois jours</h5>
+                         <ul     style="    margin-left: -61px;" class="day4"></ul>
+                        </div>
+                     </li>
+                    
+                  </ul>
+                  </div>
+                  <!-- /WEATHER FORECAST -->
+               </div>
+            </div>
+         </div>
+      </div>
+
+<div id="location">&nbsp;</div>
+
+
+
+<div id="weather">&nbsp;</div>
+   </body>
+</html>
+
+<script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js"></script>
+
+<script>
+
+
+
+
+getLocation();
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+       
+       
+        
+    } else {
+$('#weather').append('<p>Geolocation is not supported by this browser.</p>');
+       
+    }
+}
+
+var locate;
+
+function showPosition(position) {
+
+var lat=position.coords.latitude;
+var long=position.coords.longitude;
+var loc="https://maps.googleapis.com/maps/api/geocode/json?latlng="+lat+","+long+"&key=AIzaSyAHQGqGkXBlwXI_HrTgl-ssIfP4j655LFM";
+
+
+$.getJSON(loc,function(data){         
+                    locate=data.results[3].formatted_address;
+                    $('.location').append('<p style="margin-top:2px;">'+data.results[1].formatted_address+'</p>');
+       
+
+
+
+       var weather="http://api.openweathermap.org/data/2.5/weather?q="+locate+"&units=metric&appid=b585cd4ec4d6fdd2b485cad31784c901";
+       var forecast="http://api.openweathermap.org/data/2.5/forecast?q="+locate+"&units=metric&appid=b585cd4ec4d6fdd2b485cad31784c901";
+var d = new Date();
+var month=d.getMonth()+1;
+var weekday = new Array(7);
+weekday[0] =  "Dimanche";
+weekday[1] = "Lundi";
+weekday[2] = "Mardi";
+weekday[3] = "Mercredi";
+weekday[4] = "Jeudi";
+weekday[5] = "Vendredi";
+weekday[6] = "Samedi";
+
+var n = weekday[d.getDay()];
+
+$.getJSON(weather,function(data){      
+
+var sr = new Date(data.sys.sunrise * 1000);
+var sunriseTime = sr.toLocaleTimeString(); 
+var sr = new Date(data.sys.sunset * 1000);
+var sunsetTime = sr.toLocaleTimeString();    
+              
+                    $('.temp-max').append('<p>'+sunriseTime+'</p>');
+                    $('.temp-min').append('<p>'+sunsetTime+'</p>');
+                    $('.humidity').append('<p>'+data.main.humidity+"%"+'</p>');
+                    $('.wind').append('<p>'+data.wind.speed+" Km/h"+'</p>');
+                   
+                    $('.today').append(n+"/"+d.getDate()+"/"+month+"/"+d.getFullYear());
+
+
+var condition = data.weather[0].description;
+
+switch (condition) {
+    case "clear sky":
+       $('.image').append( "<img src=\"https://image.flaticon.com/icons/svg/136/136723.svg \">");
+        break;
+    case "few clouds":
+       $('.image').append( "<img src=\"https://image.flaticon.com/icons/svg/136/136722.svg \">");
+        break;
+    case "scattered clouds":
+       $('.image').append( "<img src=\"https://image.flaticon.com/icons/svg/136/136716.svg\">");
+        break;
+    case "broken clouds":
+       $('.image').append( "<img src=\"https://image.flaticon.com/icons/svg/136/136716.svg\">");
+        break;
+    case "shower rain":
+       $('.image').append( "<img src=\"http://www.mikeafford.com/store/store-images/ms02_example_heavy_rain_showers.png \">");
+        break;
+    case "rain":
+       $('.image').append( "<img src=\"https://image.flaticon.com/icons/svg/136/136711.svg\">");
+        break;
+    case "light rain":
+      $('.image').append( "<img src=\"http://www.mikeafford.com/store/store-images/ms02_example_heavy_rain_showers.png\">");
+        break;
+    case "thunderstorm":
+       $('.image').append( "<img src=\"https://image.flaticon.com/icons/svg/136/136729.svg \">");
+        break;
+    case "snow":
+       $('.image').append( "<img src=\"https://image.flaticon.com/icons/svg/136/136755.svg \">");
+        break;
+    case "mist":
+       $('.image').append( "<img src=\"https://image.flaticon.com/icons/svg/136/136702.svg \">");
+        break;
+        case "overcast clouds":
+       imagescr="<img style=\"width: 25px;margin-left:20px;\" src=\"https://image.flaticon.com/icons/svg/136/136701.svg\">";
+        break;
+}
+
+
+
+
+});          
+forecastit(forecast);
+
+});
+
+
+   }
+
+   function forecastit(forecast)
+{
+  var len=$(".day1 li").length;
+  var ville=document.getElementById('ville').value;
+  var coord=ville+",TN";
+  if (coord.length>3) {
+     forecast="http://api.openweathermap.org/data/2.5/forecast?q="+coord+"&units=metric&appid=09f74ab58fa262762895fe3d67395013";
+      $('.location').append('<p style="margin-top:2px;">'+coord+'</p>');
+  }
+ if (coord.length>3) {
+  document.querySelector(".temperature p ").remove();
+   document.querySelector(".location p ").remove();
+   document.querySelector(".image img ").remove();
+
+ for (var i = 0; i < 8; i++) {
+   
+   document.querySelector(".day2 li:nth-child(1)").remove();
+   document.querySelector(".day3 li:nth-child(1)").remove();
+   document.querySelector(".day4 li:nth-child(1)").remove();
+  } 
+  for (var i = 0; i < len; i++) {
+    
+   document.querySelector(".day1 li:nth-child(1)").remove();
+   
+  } 
+ 
+}
+  alert(forecast);
+  
+$.getJSON(forecast,function(fore){      
+
+   var count =0;
+   var day1=0;
+   var day2=0;
+   var day3=0;
+   var d=new Date();
+   var day=d.getDate();
+
+ $('.temperature').append('<p style=\"margin-top: -213px;margin-right: 33px;\">'+(Math.round(fore.list[0].main.temp))+'</p>');
+
+ if (coord.length>3) {
+var condImage=fore.list[0].weather[0].description;
+switch (condImage) {
+    case "clear sky":
+       $('.image').append( "<img src=\"https://image.flaticon.com/icons/svg/136/136723.svg \">");
+        break;
+    case "few clouds":
+       $('.image').append( "<img src=\"https://image.flaticon.com/icons/svg/136/136722.svg \">");
+        break;
+    case "scattered clouds":
+       $('.image').append( "<img src=\"https://image.flaticon.com/icons/svg/136/136716.svg\">");
+        break;
+    case "broken clouds":
+       $('.image').append( "<img src=\"https://image.flaticon.com/icons/svg/136/136716.svg\">");
+        break;
+    case "shower rain":
+       $('.image').append( "<img src=\"http://www.mikeafford.com/store/store-images/ms02_example_heavy_rain_showers.png \">");
+        break;
+    case "rain":
+       $('.image').append( "<img src=\"https://image.flaticon.com/icons/svg/136/136711.svg\">");
+        break;
+    case "light rain":
+      $('.image').append( "<img src=\"http://www.mikeafford.com/store/store-images/ms02_example_heavy_rain_showers.png\">");
+        break;
+    case "thunderstorm":
+       $('.image').append( "<img src=\"https://image.flaticon.com/icons/svg/136/136729.svg \">");
+        break;
+    case "snow":
+       $('.image').append( "<img src=\"https://image.flaticon.com/icons/svg/136/136755.svg \">");
+        break;
+    case "mist":
+       $('.image').append( "<img src=\"https://image.flaticon.com/icons/svg/136/136702.svg \">");
+        break;
+        case "overcast clouds":
+       imagescr="<img style=\"width: 25px;margin-left:20px;\" src=\"https://image.flaticon.com/icons/svg/136/136701.svg\">";
+        break;
+}
+}
+
+
+
+   fore.list.forEach(function () {
+
+var condition = fore.list[count].weather[0].description;
+
+
+
+var imagescr="";
+switch (condition) {
+  case "clear sky":
+
+     imagescr= "<img style=\"width: 25px;margin-left:20px;\" src=\"https://image.flaticon.com/icons/svg/136/136723.svg \">";
+        break;
+    case "few clouds":
+        imagescr="<img style=\"width: 25px;margin-left:20px;\" src=\"https://image.flaticon.com/icons/svg/136/136722.svg \">";
+        break;
+    case "scattered clouds":
+       imagescr= "<img style=\"width: 25px;margin-left:20px;\" src=\"https://image.flaticon.com/icons/svg/136/136716.svg  \">";
+        break;
+    case "broken clouds":
+       imagescr= "<img style=\"width: 25px;margin-left:20px;\" src=\"https://image.flaticon.com/icons/svg/136/136716.svg \">";
+        break;
+    case "shower rain":
+        imagescr="<img style=\"width: 25px;margin-left:20px;\" src=\"http://www.mikeafford.com/store/store-images/ms02_example_heavy_rain_showers.png \">";
+        break;
+    case "rain":
+        imagescr="<img style=\"width: 25px;margin-left:20px;\" src=\"https://image.flaticon.com/icons/svg/136/136711.svg\">";
+        break;
+    case "light rain":
+        imagescr="<img style=\"width: 25px;margin-left:20px;\" src=\"http://www.mikeafford.com/store/store-images/ms02_example_heavy_rain_showers.png\">";
+        break;
+    case "thunderstorm":
+        imagescr="<img style=\"width: 25px;margin-left:20px;\" src=\"https://image.flaticon.com/icons/svg/136/136729.svg \">";
+        break;
+    case "snow":
+     imagescr= "<img style=\"width: 25px;margin-left:20px;\" src=\"https://image.flaticon.com/icons/svg/136/136755.svg \">";
+        break;
+    case "mist":
+       imagescr="<img style=\"width: 25px;margin-left:20px;\" src=\"https://image.flaticon.com/icons/svg/136/136702.svg\">";
+        break;
+    case "overcast clouds":
+       imagescr="<img style=\"width: 25px;margin-left:20px;\" src=\"https://image.flaticon.com/icons/svg/136/136701.svg\">";
+        break;
+        
+}
+
+    var forecast_day=fore.list[count].dt_txt.split('-')[2].split(' ')[0];
+
+
+    if (forecast_day==day) {$('.day1').append("<li style=\"margin-bottom: 13px;list-style-type: none;\">"+fore.list[count].dt_txt.split('-')[2].split(' ')[1]+"=>+"+fore.list[count].main.temp+imagescr+"</li>");} 
+   else if(day1<8)
+    {
+   $('.day2').append("<li style=\"margin-bottom: 13px;list-style-type: none;\">"+fore.list[count].dt_txt.split('-')[2].split(' ')[1]+"=>+"+fore.list[count].main.temp+imagescr+"</li>");day1+=1;} 
+   else if(day2<8&&day1==8)
+    {
+   $('.day3').append("<li style=\"margin-bottom: 13px;list-style-type: none;\">"+fore.list[count].dt_txt.split('-')[2].split(' ')[1]+"=>+"+fore.list[count].main.temp+imagescr+"</li>");day2+=1;} 
+   else if(day3<8&&day1==8&&day2==8)
+  {$('.day4').append("<li style=\"margin-bottom: 13px;list-style-type: none;\">"+fore.list[count].dt_txt.split('-')[2].split(' ')[1]+"=>+"+fore.list[count].main.temp+imagescr+"</li>");day3+=1;} 
+    count += 1;
+
+});
+
+
+
+});  
+
+}
+
+
+
+
+
+
+
+
+</script>
+
+
+
+
+<style type="text/css">
+
+   * {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+html,
+body,
+.main-wrapper,
+.main-wrapper-front {
+  width: 99%;
+  height: 98%;
+}
+body {
+  color: #fff;
+  font-family: 'Roboto', sans-serif;
+}
+.main-wrapper {
+  position: relative;
+  overflow: hidden;
+  height: 900px;
+}
+.main-wrapper > .main-wrapper-mask,
+.main-wrapper > .main-wrapper-blur {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.main-wrapper > .main-wrapper-mask {
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  opacity: 0.3;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";
+  filter: alpha(opacity=30);
+  background: #000;
+}
+.main-wrapper > .main-wrapper-blur {
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  background-size: cover;
+  background-position: center center;
+  width: 50% !important;
+  height: 50% !important;
+  -webkit-transform-origin: 12% 5%;
+  -moz-transform-origin: 12% 5%;
+  -o-transform-origin: 12% 5%;
+  -ms-transform-origin: 12% 5%;
+  transform-origin: 12% 5%;
+  -webkit-transform: scale(2.5);
+  -moz-transform: scale(2.5);
+  -o-transform: scale(2.5);
+  -ms-transform: scale(2.5);
+  transform: scale(2.5);
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  background-size: cover;
+  -webkit-filter: blur(10px);
+  -moz-filter: blur(10px);
+  -o-filter: blur(10px);
+  filter: blur(10px);
+  z-index: 0;
+}
+.main-wrapper > .main-wrapper-blur:before {
+  content: '';
+  -webkit-backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  -ms-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+.main-wrapper > .main-wrapper-front {
+  position: relative;
+  z-index: 6;
+}
+.full-center {
+  left: 50%;
+  position: absolute !important;
+  top: 50%;
+  bottom: -48%;
+  -webkit-transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -o-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+.widget-block {
+  width: 825px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  background: rgba(255,255,255,0.2);
+}
+.img-area {
+  -webkit-border-radius: 5px 5px 0 0;
+  border-radius: 5px 5px 0 0;
+  position: relative;
+}
+.img-area img {
+  width: 100%;
+  -webkit-border-radius: 5px 5px 0 0;
+  border-radius: 5px 5px 0 0;
+  display: block;
+  z-index: 1;
+}
+.img-area .img-area-mask {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  -webkit-border-radius: 5px 5px 0 0;
+  border-radius: 5px 5px 0 0;
+  z-index: 2;
+  opacity: 0.5;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+  filter: alpha(opacity=50);
+}
+.img-area .img-area-front {
+  z-index: 3;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+.week-forecast {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+.week-forecast > li {
+  border-top: 3px solid #fc0203;
+  float: left;
+  width: 200px;
+  height: 390px;
+}
+
+.week-forecast > li > .inner {
+  border-right: 1px solid rgba(0,0,0,0.1);
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  text-align: center;
+}
+.week-forecast > li > .inner .climacon {
+  text-shadow: 0 3px 1px rgba(0,0,0,0.1);
+  font-size: 40px;
+  width: 50px;
+  height: 50px;
+  line-height: 50px;
+  text-align: center;
+  -webkit-border-radius: 50%;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.1);
+  margin-bottom: 5px;
+}
+.week-forecast > li > .inner .climacon.rain.sun {
+  padding-top: 2px;
+  padding-left: 3px;
+}
+.week-forecast > li > .inner .climacon.cloud.sun {
+  padding-top: 4px;
+  padding-left: 2px;
+}
+.week-forecast > li:last-child > .inner {
+  border-right: none;
+}
+.weather-icon-sm {
+  width: 30px;
+  height: 30px;
+  background: #fff;
+  display: inline-block;
+  -webkit-border-radius: 50%;
+  border-radius: 50%;
+}
+.weather-icon-lg {
+  width: 150px;
+  height: 150px;
+  background: #fff;
+  display: block;
+  -webkit-border-radius: 50%;
+  border-radius: 50%;
+  display: inline-block;
+  position: absolute;
+  top: 50%;
+  margin-top: -75px;
+  left: 50%;
+  margin-left: -75px;
+}
+.week-day {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-weight: 300;
+  font-size: 15px;
+  
+}
+.week-day-temperature {
+  margin: 0;
+  position: relative;
+}
+.week-day-temperature:after {
+  content: '';
+  width: 3px;
+  height: 3px;
+  -webkit-border-radius: 50%;
+  border-radius: 50%;
+  border: 1px solid #fff;
+  position: absolute;
+  top: 1px;
+  right: 18px;
+  display: block;
+  opacity: 0.85;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=85)";
+  filter: alpha(opacity=85);
+}
+.week-day-temperature:before {
+  content: '+';
+  position: absolute;
+  left: 16px;
+  top: 1px;
+  font-size: 15px;
+  opacity: 0.85;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=85)";
+  filter: alpha(opacity=85);
+}
+.week-day-temperature.minus:before {
+  content: '-';
+}
+.temperature {
+  text-align: right;
+  margin: 0;
+  font-size: 130px;
+  height: 100%;
+  line-height: 200px;
+  position: relative;
+  font-weight: 100;
+}
+.temperature:after {
+  content: '';
+  top: 45px;
+  right: -15px;
+  height: 10px;
+  width: 10px;
+  -webkit-border-radius: 50%;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  line-height: 1;
+  position: absolute;
+  opacity: 0.85;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=85)";
+  filter: alpha(opacity=85);
+}
+.temperature:before {
+  content: '+';
+  left: 20px;
+  font-size: 60px;
+  position: relative;
+  top: -24px;
+  padding-right: 20px;
+}
+.temperature.minus:before {
+  content: '-';
+}
+
+.weather-block-info {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  
+  display: table;
+  margin: -100px auto 0 auto;
+  position: relative;
+  top: 50%;
+}
+.weather-block-info > li {
+  float: left;
+  width: 200px;
+  height: 300px;
+  margin: 0 5px;
+  position: relative;
+}
+.weather-params {
+  opacity: 0.75;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=75)";
+  filter: alpha(opacity=75);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  left: 0;
+  position: absolute;
+  top: 50%;
+  -webkit-transform: translate(0, -50%);
+  -moz-transform: translate(0, -50%);
+  -o-transform: translate(0, -50%);
+  -ms-transform: translate(0, -50%);
+  transform: translate(0, -50%);
+}
+
+.weather-params > li .climacon {
+  display: block;
+  font-size: 50px;
+  float: left;
+  margin-right: 10px;
+  line-height: 37px;
+  height: 37px;
+  width: 37px;
+  text-align: center;
+}
+.weather-params > li span {
+  position: relative;
+  top: 10px;
+  font-weight: 300;
+}
+.location,
+.today {
+  position: absolute;
+  font-weight: 300;
+  font-size: 25px;
+  text-align: center;
+  width: 100%;
+  margin: 0;
+  top: 15px;
+  left: 0;
+}
+.today {
+  font-size: 14px;
+  top: 50px;
+  color: rgba(255,255,255,0.85);
+}
+.weather-desc {
+  position: absolute;
+  text-align: center;
+  bottom: 35px;
+  width: 100%;
+}
+.weather-desc > span {
+  display: inline-block;
+  padding: 5px 10px;
+  background: rgba(0,0,0,0.3);
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 300;
+}
+@media screen and (max-width: 1060px) {
+}
+
+@media screen and (max-width: 768px) {
+  .week-forecast > li {
+    border-top: 3px solid #fc0203;
+    float: left;
+    width: 100%;
+    height: 400px;
+}
+
+.inner >ul
+{
+  display: inline-grid;
+}
+.main-wrapper {
+    height: 2135px;
+}
+
+.weather-block-info > li {
+      width: 25%;
+    margin-top: -10%;
+  }
+  .full-center > input
+  {
+    text-align: center;
+    display: block;
+    margin: auto;
+    width: 32%;
+        
+  }
+  .full-center > button
+  {
+   
+         margin: auto;
+    display: inherit;
+    width: 30%;
+    border-radius: 12px;
+
+  }
+  .day1 >li
+  {
+        margin-bottom: 13px;
+    list-style-type: none;
+    text-align: center;
+    /* float: left; */
+    width: 100%;
+  }
+  .day2 >li
+  {
+        margin-bottom: 13px;
+    list-style-type: none;
+    text-align: center;
+    /* float: left; */
+    width: 100%;
+  }
+  .day3 >li
+  {
+        margin-bottom: 13px;
+    list-style-type: none;
+    text-align: center;
+    /* float: left; */
+    width: 100%;
+  }
+  .day4 >li
+  {
+        margin-bottom: 13px;
+    list-style-type: none;
+    text-align: center;
+    /* float: left; */
+    width: 100%;
+  }
+  iframe
+  {
+    height: 3000px
+  }
+  .weather-params
+  {
+    display: none;
+  }
+  .temperature
+  {
+    margin-left: 129%;
+    margin-top: 69%;
+  }
+     
+
+
+}
+
+/* VARIABLES */
+
+
+
+</style>
+
+
+
+
+
